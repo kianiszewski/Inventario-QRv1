@@ -5,6 +5,7 @@ const BarcodeScanner = () => {
   const [data, setData] = useState('No hay resultados');
   const [scanning, setScanning] = useState(false);
   const [info, setInfo] = useState({
+    codigo: '',
     descripcion: '',
     cantidad: '',
     ubicacion: ''
@@ -37,28 +38,27 @@ const BarcodeScanner = () => {
 
   // Función para procesar la información del QR
   const parseQRData = (text) => {
-    const lines = text.split('\n');  // Separar las líneas del texto
     const data = {
+      codigo: '',
       descripcion: '',
       cantidad: '',
       ubicacion: ''
     };
 
-    lines.forEach(line => {
-      const [key, value] = line.split(':');  // Dividimos en clave:valor
+    // Separamos por comas y luego por los dos puntos
+    const pairs = text.split(',').map(item => item.split(':'));
+    pairs.forEach(([key, value]) => {
       if (key && value) {
-        switch (key.trim().toLowerCase()) {
-          case 'descripcion':
-            data.descripcion = value.trim();
-            break;
-          case 'cantidad':
-            data.cantidad = value.trim();
-            break;
-          case 'ubicacion':
-            data.ubicacion = value.trim();
-            break;
-          default:
-            break;
+        const trimmedKey = key.trim().toLowerCase();
+        const trimmedValue = value.trim();
+        if (trimmedKey === 'código') {
+          data.codigo = trimmedValue;
+        } else if (trimmedKey === 'descripción') {
+          data.descripcion = trimmedValue;
+        } else if (trimmedKey === 'cantidad') {
+          data.cantidad = trimmedValue;
+        } else if (trimmedKey === 'ubicación') {
+          data.ubicacion = trimmedValue;
         }
       }
     });
@@ -76,6 +76,7 @@ const BarcodeScanner = () => {
 
       <div style={{ marginTop: '20px', textAlign: 'left' }}>
         <h2>Información capturada:</h2>
+        <p><strong>Código:</strong> {info.codigo || 'N/A'}</p>
         <p><strong>Descripción:</strong> {info.descripcion || 'N/A'}</p>
         <p><strong>Cantidad:</strong> {info.cantidad || 'N/A'}</p>
         <p><strong>Ubicación:</strong> {info.ubicacion || 'N/A'}</p>
